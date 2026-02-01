@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import api from "../../services/api";// ✅ Import the API instance
-
+import api from "../../../services/api";
 const UI = {
   // Page
   pageBg: 'bg-gray-50',

@@ -27,7 +27,7 @@ import {
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import EmployerLayout from '../../../layouts/EmployerLayout';
-import api from "../../services/api"; // ✅ FIXED: Correct import path
+import api from "../../../services/api";
 
 // ---------------- UI TOKENS ----------------
 const UI = {

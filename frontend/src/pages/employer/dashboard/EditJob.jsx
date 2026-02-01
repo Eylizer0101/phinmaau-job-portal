@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import api from "../../services/api"; // ✅ CHANGED: Import api instead of axios
+import api from "../../../services/api";
 import EmployerLayout from '../../../layouts/EmployerLayout';
 
 /* =======================

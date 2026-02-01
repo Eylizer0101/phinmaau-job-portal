@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import EmployerLayout from '../../../layouts/EmployerLayout';
-import api from "../../services/api";
-
+import api from "../../../services/api";
 const ManageJobs = () => {
   const navigate = useNavigate();
 

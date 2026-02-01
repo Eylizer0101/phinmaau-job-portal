@@ -15,7 +15,7 @@ import {
   faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
 import EmployerLayout from '../../../layouts/EmployerLayout';
-import api from "../../services/api";
+import api from "../../../services/api";
 
 /** ---------- Small UI helpers ---------- */
 const cx = (...classes) => classes.filter(Boolean).join(' ');

@@ -24,7 +24,7 @@ import {
   faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import JobSeekerNavbar from '../../../components/shared/JobSeekerNavbar';
-import api from '../../../services/api';
+import api from "../../../services/api";
 
 const MAX_LATEST_JOBS = 4;
 

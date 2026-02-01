@@ -1,8 +1,7 @@
 // src/pages/employer/auth/EmployerRegisterPage.jsx
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from "../../services/api"; // ✅ CHANGED: Import api instead of axios
-
+import api from "../../../services/api";
 const INDUSTRIES = [
   'Accounting',
   'Advertising & Marketing',

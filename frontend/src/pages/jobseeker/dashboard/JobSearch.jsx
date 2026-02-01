@@ -4,7 +4,7 @@ import axios from 'axios';
 import JobSeekerLayout from '../../../layouts/JobSeekerLayout';
 
 // ✅ IMPORTANT: Import your API instance
-import api from "../../services/api";// Adjust path if needed
+import api from "../../../services/api";
 
 const JobSearch = () => {
   const navigate = useNavigate();

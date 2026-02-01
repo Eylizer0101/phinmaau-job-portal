@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmployerLayout from '../../../layouts/EmployerLayout';
-import api from "../../services/api";
+import api from "../../../services/api";
 
 const Alert = ({ type, children }) => {
   const isError = type === 'error';
