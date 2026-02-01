@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import api from "../../../services/api";
+import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
 import EmployerLayout from '../../../layouts/EmployerLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -16,7 +16,7 @@ import {
   faClock,
   faArrowUpRightFromSquare,
 } from '@fortawesome/free-solid-svg-icons';
-import { useLocation } from 'react-router-dom'; // ✅ ADD: for reading #verification hash
+import { useLocation } from 'react-router-dom';
 
 const cx = (...s) => s.filter(Boolean).join(' ');
 
@@ -188,7 +188,6 @@ const CompanyProfile = () => {
     addressProof: { fileName: '' },
   });
 
-  const tokenRef = useRef(null);
   const logoInputRef = useRef(null);
   const docInputRefs = useRef({
     dtiSec: null,
@@ -291,13 +290,6 @@ const CompanyProfile = () => {
       setLoading(true);
       clearMessages();
       clearFieldErrors();
-
-      if (!tokenRef.current) tokenRef.current = localStorage.getItem('token');
-
-      if (!tokenRef.current) {
-        setError('Missing token. Please log in again.');
-        return;
-      }
 
       // ✅ CHANGED: Use api instance instead of axios with localhost
       const response = await api.get('/auth/me');
@@ -547,12 +539,6 @@ const CompanyProfile = () => {
       setSaving(true);
 
       try {
-        if (!tokenRef.current) tokenRef.current = localStorage.getItem('token');
-        if (!tokenRef.current) {
-          setError('Missing token. Please log in again.');
-          return;
-        }
-
         const normalizedWebsite = companyData.companyWebsite?.trim()
           ? normalizeUrl(companyData.companyWebsite)
           : '';
@@ -671,12 +657,6 @@ const CompanyProfile = () => {
       }
 
       try {
-        if (!tokenRef.current) tokenRef.current = localStorage.getItem('token');
-        if (!tokenRef.current) {
-          setError('Missing token. Please log in again.');
-          return;
-        }
-
         setDocUploading((p) => ({ ...p, [docType]: true }));
 
         const fd = new FormData();
