@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import EmployerLayout from '../../../layouts/EmployerLayout';
+import api from '../../services/api';
 
 const Alert = ({ type, children }) => {
   const isError = type === 'error';
@@ -266,8 +266,6 @@ const PostJob = () => {
   };
 
   const postJob = async ({ isDraft }) => {
-    const token = localStorage.getItem('token');
-
     const normalizedSkillsString = skills.join(', ');
     const normalizedExperienceLevel = normalizeExperienceLevel(formData.experienceLevel);
 
@@ -281,12 +279,7 @@ const PostJob = () => {
       category: companyCategoryDefault,
     };
 
-    return axios.post('http://localhost:5000/api/jobs', payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    return api.post('/jobs', payload);
   };
 
   const handleSaveDraft = async () => {
@@ -313,7 +306,7 @@ const PostJob = () => {
 
     // ✅ NEW: front gate (backend also enforces)
     if (!isEmployerVerified) {
-      setError('Your company is not verified yet. You can save drafts, but you can’t publish until verified.');
+      setError('Your company is not verified yet. You can save drafts, but you can\'t publish until verified.');
       setLoading(false);
       return;
     }

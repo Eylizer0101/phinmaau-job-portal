@@ -7,8 +7,8 @@ const EmployerLoginPage = () => {
   const location = useLocation();
 
   const API_URL = process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/auth/login`
-    : 'http://localhost:5000/api/auth/login';
+    ? process.env.REACT_APP_API_URL
+    : 'http://localhost:5000/api';
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +61,7 @@ const EmployerLoginPage = () => {
       password: formData.password,
       ...(withRole ? { role: 'employer' } : {}),
     };
-    return axios.post(API_URL, payload);
+    return axios.post(`${API_URL}/auth/login`, payload);
   };
 
   // ✅ NEW: client-side required validation (show messages under fields)

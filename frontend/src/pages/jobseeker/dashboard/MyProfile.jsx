@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import JobSeekerLayout from '../../../layouts/JobSeekerLayout';
 import debounce from 'lodash/debounce';
+import api from '../../../services/api'; // ✅ Import the API instance
 
 // ✅ FontAwesome icons via react-icons
 import {
@@ -438,22 +438,20 @@ const MyProfile = () => {
     setProfileImageUploading(true);
 
     try {
-      const token = localStorage.getItem('token');
-
-      // ✅ Upload to backend (adjust endpoint if your backend uses a different route)
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
       const imgForm = new FormData();
       imgForm.append('profileImage', file);
 
-      const uploadResponse = await axios.post(
-        'http://localhost:5000/api/auth/upload-profile-image',
+      const uploadResponse = await api.post(
+        '/auth/upload-profile-image',
         imgForm,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         }
       );
+      // ✅ No need for manual Authorization headers - handled by interceptor
 
       if (uploadResponse.data?.success) {
         const updatedUser = uploadResponse.data.user || uploadResponse.data.updatedUser || null;
@@ -520,16 +518,17 @@ const MyProfile = () => {
         }
 
         if (Object.keys(updateData).length > 0) {
-          await axios.put(
-            'http://localhost:5000/api/auth/update-profile',
+          // ✅ FIXED: Use api instance instead of hardcoded localhost
+          await api.put(
+            '/auth/update-profile',
             updateData,
             {
               headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
               }
             }
           );
+          // ✅ No need for manual Authorization headers
 
           setLastSaved(new Date().toLocaleTimeString());
           setHasUnsavedChanges(false);
@@ -613,7 +612,6 @@ const MyProfile = () => {
   const saveCurrentSection = async () => {
     try {
       setSavingTab(activeSection);
-      const token = localStorage.getItem('token');
 
       let updateData = {};
 
@@ -640,16 +638,17 @@ const MyProfile = () => {
         const formDataToSend = new FormData();
         formDataToSend.append('resume', resumeFile);
 
-        const uploadResponse = await axios.post(
-          'http://localhost:5000/api/auth/upload-resume',
+        // ✅ FIXED: Use api instance instead of hardcoded localhost
+        const uploadResponse = await api.post(
+          '/auth/upload-resume',
           formDataToSend,
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'multipart/form-data'
             }
           }
         );
+        // ✅ No need for manual Authorization headers
 
         if (uploadResponse.data.success) {
           setFormData(prev => ({
@@ -664,16 +663,17 @@ const MyProfile = () => {
         }
       }
 
-      const response = await axios.put(
-        'http://localhost:5000/api/auth/update-profile',
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.put(
+        '/auth/update-profile',
         updateData,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }
       );
+      // ✅ No need for manual Authorization headers
 
       if (response.data.success) {
         setHasUnsavedChanges(false);
@@ -704,23 +704,22 @@ const MyProfile = () => {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-
       let finalResumeUrl = formData.resumeUrl;
       if (resumeFile) {
         const formDataToSend = new FormData();
         formDataToSend.append('resume', resumeFile);
 
-        const uploadResponse = await axios.post(
-          'http://localhost:5000/api/auth/upload-resume',
+        // ✅ FIXED: Use api instance instead of hardcoded localhost
+        const uploadResponse = await api.post(
+          '/auth/upload-resume',
           formDataToSend,
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'multipart/form-data'
             }
           }
         );
+        // ✅ No need for manual Authorization headers
 
         if (uploadResponse.data.success) {
           finalResumeUrl = uploadResponse.data.resumeUrl;
@@ -742,16 +741,17 @@ const MyProfile = () => {
         }
       };
 
-      const response = await axios.put(
-        'http://localhost:5000/api/auth/update-profile',
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.put(
+        '/auth/update-profile',
         updateData,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }
       );
+      // ✅ No need for manual Authorization headers
 
       if (response.data.success) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -776,16 +776,10 @@ const MyProfile = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
 
-        if (!token) {
-          navigate('/login');
-          return;
-        }
-
-        const response = await axios.get('http://localhost:5000/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        // ✅ FIXED: Use api instance instead of hardcoded localhost
+        const response = await api.get('/auth/me');
+        // ✅ No need for manual Authorization headers - handled by interceptor
 
         if (response.data.success) {
           const user = response.data.user;
@@ -820,7 +814,11 @@ const MyProfile = () => {
         }
       } catch (err) {
         console.error('Error fetching user data:', err);
-        setError('Failed to load profile. Please refresh the page.');
+        if (err.response?.status === 401) {
+          navigate('/login');
+        } else {
+          setError('Failed to load profile. Please refresh the page.');
+        }
       } finally {
         setLoading(false);
       }

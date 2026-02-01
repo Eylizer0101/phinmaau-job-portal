@@ -24,6 +24,9 @@ import {
 import axios from 'axios';
 import JobSeekerLayout from '../../../layouts/JobSeekerLayout';
 
+// ✅ IMPORTANT: Import your API instance
+import api from '../../../services/api'; // Adjust path if needed
+
 /**
  * Polished:
  * - Header card layout/spacing
@@ -455,7 +458,8 @@ const JobDetails = () => {
       setLoading(true);
       setError('');
 
-      const response = await axios.get(`http://localhost:5000/api/jobs/${id}`);
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.get(`/jobs/${id}`);
 
       if (response.data.success) {
         const jobData = response.data.job;
@@ -486,9 +490,8 @@ const JobDetails = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await axios.get(`http://localhost:5000/api/applications/check/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.get(`/applications/check/${id}`);
 
       if (response.data.success) {
         setHasApplied(Boolean(response.data.hasApplied));
@@ -504,7 +507,8 @@ const JobDetails = () => {
       try {
         if (!category) return;
 
-        const response = await axios.get('http://localhost:5000/api/jobs', {
+        // ✅ FIXED: Use api instance instead of hardcoded localhost
+        const response = await api.get('/jobs', {
           params: { category, limit: 4 },
         });
 
@@ -623,16 +627,9 @@ const JobDetails = () => {
     try {
       setApplying(true);
 
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `http://localhost:5000/api/applications/apply/${job._id}`,
-        { coverLetter },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.post(`/applications/apply/${job._id}`, 
+        { coverLetter }
       );
 
       if (response.data.success) {

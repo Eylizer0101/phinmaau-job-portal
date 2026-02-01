@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import EmployerLayout from '../../../layouts/EmployerLayout';
+import api from '../../services/api';
 
 const ManageJobs = () => {
   const navigate = useNavigate();
@@ -86,11 +86,8 @@ const ManageJobs = () => {
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
 
-      const response = await axios.get('http://localhost:5000/api/jobs/employer/my-jobs', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get('/jobs/employer/my-jobs');
 
       if (response.data.success) {
         setJobs(response.data.jobs);
@@ -154,7 +151,7 @@ const ManageJobs = () => {
 
   /**
    * ✅ UPDATED: status logic now includes Expired as a visible truth
-   * (avoids “Active badge but Expired meta” confusion).
+   * (avoids "Active badge but Expired meta" confusion).
    */
   const getDerivedStatus = (job) => {
     if (job.isPublished === false) return 'draft';
@@ -205,20 +202,13 @@ const ManageJobs = () => {
       if (action.jobId) return; // keep single in-flight action (safe)
       setAction({ type: 'publish', jobId });
 
-      const token = localStorage.getItem('token');
-
       const updateData = {
         ...jobToUpdate,
         isPublished: true,
         isActive: true, // publish as Open by default
       };
 
-      await axios.put(`http://localhost:5000/api/jobs/${jobId}`, updateData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await api.put(`/jobs/${jobId}`, updateData);
 
       setJobs(prev =>
         prev.map(job => (job._id === jobId ? { ...job, isPublished: true, isActive: true } : job))
@@ -257,19 +247,12 @@ const ManageJobs = () => {
       if (action.jobId) return; // one action at a time
       setAction({ type: 'status', jobId });
 
-      const token = localStorage.getItem('token');
-
       const updateData = {
         ...jobToUpdate,
         isActive: newStatus === 'open',
       };
 
-      await axios.put(`http://localhost:5000/api/jobs/${jobId}`, updateData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      await api.put(`/jobs/${jobId}`, updateData);
 
       setJobs(prev =>
         prev.map(job => (job._id === jobId ? { ...job, isActive: newStatus === 'open' } : job))
@@ -290,11 +273,7 @@ const ManageJobs = () => {
       if (action.jobId) return; // one action at a time
       setAction({ type: 'delete', jobId });
 
-      const token = localStorage.getItem('token');
-
-      await axios.delete(`http://localhost:5000/api/jobs/${jobId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/jobs/${jobId}`);
 
       setJobs(prev => prev.filter(job => job._id !== jobId));
       closeModal();
@@ -843,7 +822,7 @@ const ManageJobs = () => {
 
                 <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
                   <p className="font-semibold text-red-900">
-                    “{selectedJob.title || 'Untitled Draft'}”
+                    "{selectedJob.title || 'Untitled Draft'}"
                   </p>
                   <p id="delete-desc" className="mt-1 text-sm text-red-800">
                     All applications and related data will be permanently deleted.

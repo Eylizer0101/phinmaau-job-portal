@@ -1,7 +1,7 @@
 // src/pages/employer/dashboard/EmployerDashboard.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faExclamationCircle,
@@ -66,28 +66,20 @@ const EmployerDashboard = () => {
       if (silent) setRefreshing(true);
       else setLoading(true);
 
-      const token = localStorage.getItem('token');
+      // ✅ CHANGED: Use api instance instead of axios with localhost
 
       // ✅ Jobs + Apps
-      const jobsResponse = await axios.get('http://localhost:5000/api/jobs/employer/my-jobs', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const jobsResponse = await api.get('/jobs/employer/my-jobs');
 
-      const appsResponse = await axios.get('http://localhost:5000/api/applications/employer/all', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const appsResponse = await api.get('/applications/employer/all');
 
       // ✅ Messages endpoints
-      const conversationsResponse = await axios
-        .get('http://localhost:5000/api/messages/conversations', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+      const conversationsResponse = await api
+        .get('/messages/conversations')
         .catch(() => ({ data: { success: false, data: [] } }));
 
-      const unreadCountResponse = await axios
-        .get('http://localhost:5000/api/messages/unread-count', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+      const unreadCountResponse = await api
+        .get('/messages/unread-count')
         .catch(() => ({ data: { success: false, data: { unreadCount: 0 } } }));
 
       // ✅ Messages numbers
@@ -200,7 +192,7 @@ const EmployerDashboard = () => {
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('We couldn’t load your dashboard. Please try again.');
+      setError('We couldn\'t load your dashboard. Please try again.');
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
 import EmployerLayout from '../../../layouts/EmployerLayout';
 
 /* =======================
@@ -536,10 +536,8 @@ const EditJob = () => {
         setLoading(true);
         clearMessages();
 
-        const token = localStorage.getItem('token');
-        const res = await axios.get(`http://localhost:5000/api/jobs/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // ✅ CHANGED: Use api instance instead of axios with localhost
+        const res = await api.get(`/jobs/${id}`);
 
         if (!res.data?.success) {
           setError('Job not found.');
@@ -584,10 +582,8 @@ const EditJob = () => {
   }, [id]);
 
   const persist = async (payload) => {
-    const token = localStorage.getItem('token');
-    const res = await axios.put(`http://localhost:5000/api/jobs/${id}`, payload, {
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    });
+    // ✅ CHANGED: Use api instance instead of axios with localhost
+    const res = await api.put(`/jobs/${id}`, payload);
 
     if (!res.data?.success) {
       throw new Error(res.data?.message || 'Failed to save.');
@@ -748,13 +744,12 @@ const EditJob = () => {
 
     setTogglingStatus(true);
     try {
-      const token = localStorage.getItem('token');
       const newActive = !formData.isActive;
 
-      const res = await axios.put(
-        `http://localhost:5000/api/jobs/${id}`,
-        { isActive: newActive },
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+      // ✅ CHANGED: Use api instance instead of axios with localhost
+      const res = await api.put(
+        `/jobs/${id}`,
+        { isActive: newActive }
       );
 
       if (!res.data?.success) {
@@ -783,10 +778,8 @@ const EditJob = () => {
     clearMessages();
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/jobs/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // ✅ CHANGED: Use api instance instead of axios with localhost
+      await api.delete(`/jobs/${id}`);
 
       setSuccess('Job deleted.');
       setTimeout(() => navigate('/employer/manage-jobs'), 700);
@@ -1507,7 +1500,7 @@ const EditJob = () => {
                   </div>
 
                   <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
-                    <p className="font-semibold text-red-900">“{formData.title?.trim() || 'Untitled Draft'}”</p>
+                    <p className="font-semibold text-red-900">"{(formData.title?.trim() || 'Untitled Draft')}"</p>
                     <p className="mt-1 text-sm text-red-800">
                       All applications and related data will be permanently deleted.
                     </p>

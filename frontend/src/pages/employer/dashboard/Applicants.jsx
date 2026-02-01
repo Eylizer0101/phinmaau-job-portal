@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
 import EmployerLayout from '../../../layouts/EmployerLayout';
 
 /* =======================
@@ -383,19 +383,22 @@ const Applicants = () => {
   const location = useLocation();
   const { jobId } = useParams();
 
-  // ✅ API base (same pattern with EmployerMessages.jsx)
-  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  // ✅ REMOVED: API_BASE variable since we'll use api.js
 
   // ✅ track broken avatars so we can fallback to initials
   const [brokenAvatars, setBrokenAvatars] = useState(() => new Set());
 
+  // ✅ UPDATED: Simplified getImageUrl function
   const getImageUrl = useCallback(
     (url) => {
       if (!url) return '';
       if (url.startsWith('http')) return url;
-      return `${API_BASE}${url}`;
+      
+      // Remove /api suffix if present, then add the image path
+      const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+      return `${baseUrl}${url}`;
     },
-    [API_BASE]
+    []
   );
 
   const markBroken = useCallback((key) => {
@@ -498,22 +501,18 @@ const Applicants = () => {
     );
   };
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return { Authorization: `Bearer ${token}` };
-  };
+  // ✅ REMOVED: getAuthHeaders function (not needed with api.js)
 
   const handleAuthError = () => {
     localStorage.removeItem('token');
     navigate('/employer/login');
   };
 
+  // ✅ UPDATED: fetchJobs using api.js
   const fetchJobs = useCallback(async () => {
     try {
       setJobsLoading(true);
-      const res = await axios.get('http://localhost:5000/api/jobs/employer/my-jobs', {
-        headers: getAuthHeaders(),
-      });
+      const res = await api.get('/jobs/employer/my-jobs');
       if (res.data?.success) setJobs(res.data.jobs || []);
       else setJobs([]);
     } catch (err) {
@@ -524,17 +523,18 @@ const Applicants = () => {
     } finally {
       setJobsLoading(false);
     }
-  }, [navigate]);
+  }, []);
 
+  // ✅ UPDATED: fetchApplications using api.js
   const fetchApplications = useCallback(async () => {
     try {
       setAppsLoading(true);
       clearMessages();
 
-      let url = 'http://localhost:5000/api/applications/employer/all';
-      if (selectedJob !== 'all') url = `http://localhost:5000/api/applications/job/${selectedJob}`;
+      let url = '/applications/employer/all';
+      if (selectedJob !== 'all') url = `/applications/job/${selectedJob}`;
 
-      const res = await axios.get(url, { headers: getAuthHeaders() });
+      const res = await api.get(url);
 
       if (res.data?.success) setAllApplications(res.data.applications || []);
       else setAllApplications([]);
@@ -550,7 +550,7 @@ const Applicants = () => {
     } finally {
       setAppsLoading(false);
     }
-  }, [selectedJob, navigate]);
+  }, [selectedJob]);
 
   useEffect(() => {
     fetchJobs();
@@ -607,17 +607,16 @@ const Applicants = () => {
     return sorted;
   }, [allApplications, debouncedQuery, sort, statusFilter]);
 
-  // ✅ DAGDAG: Updated handleStatusUpdate with messaging success message
+  // ✅ UPDATED: handleStatusUpdate using api.js
   const handleStatusUpdate = async (applicationId, newStatus) => {
     try {
       if (isBusy) return;
       setUpdatingId(applicationId);
       clearMessages();
 
-      const res = await axios.put(
-        `http://localhost:5000/api/applications/${applicationId}/status`,
-        { status: newStatus },
-        { headers: getAuthHeaders() }
+      const res = await api.put(
+        `/applications/${applicationId}/status`,
+        { status: newStatus }
       );
 
       if (res.data?.success) {

@@ -36,8 +36,8 @@ const EmployerRegisterPage = () => {
   const navigate = useNavigate();
 
   const API_URL = process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/auth/register`
-    : 'http://localhost:5000/api/auth/register';
+  ? process.env.REACT_APP_API_URL
+  : 'http://localhost:5000/api';
 
   const [formData, setFormData] = useState({
     contactPerson: '',
@@ -143,7 +143,7 @@ const EmployerRegisterPage = () => {
         },
       };
 
-      const response = await axios.post(API_URL, payload);
+      const response = await axios.post(`${API_URL}/auth/register`, payload);
 
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));

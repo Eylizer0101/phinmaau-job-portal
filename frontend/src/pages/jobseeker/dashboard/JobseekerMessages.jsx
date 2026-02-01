@@ -30,6 +30,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import JobSeekerLayout from '../../../layouts/JobSeekerLayout';
 
+// ✅ IMPORTANT: Import your API instance
+import api from '../../../services/api'; // Adjust path if needed
+
 const UI = {
   // Page
   pageBg: 'bg-gray-50',
@@ -172,16 +175,20 @@ const JobseekerMessages = () => {
   const currentUserId = useMemo(() => getUserId(), [getUserId]);
   const getToken = () => localStorage.getItem('token');
 
+  // ✅ FIXED: Remove hardcoded localhost
   const getFileUrl = (fileUrl) => {
     if (!fileUrl) return '';
     if (fileUrl.startsWith('http')) return fileUrl;
-    return `http://localhost:5000${fileUrl}`;
+    // Return relative URL - browser will handle the base
+    return fileUrl.startsWith('/') ? fileUrl : `/${fileUrl}`;
   };
 
+  // ✅ FIXED: Remove hardcoded localhost
   const getCompanyLogoUrl = (logoPath) => {
     if (!logoPath || logoPath === '') return null;
     if (logoPath.startsWith('http')) return logoPath;
-    return `http://localhost:5000${logoPath.startsWith('/') ? logoPath : '/' + logoPath}`;
+    // Return relative URL - browser will handle the base
+    return logoPath.startsWith('/') ? logoPath : `/${logoPath}`;
   };
 
   const getEmployerKey = (employerData) => {
@@ -306,10 +313,8 @@ const JobseekerMessages = () => {
   // ---------- API ----------
   const fetchConversations = useCallback(async () => {
     try {
-      const token = getToken();
-      const response = await axios.get('http://localhost:5000/api/messages/conversations', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.get('/messages/conversations');
 
       if (response.data?.success) setConversations(response.data.data || []);
     } catch (error) {
@@ -319,10 +324,8 @@ const JobseekerMessages = () => {
 
   const fetchEmployers = useCallback(async () => {
     try {
-      const token = getToken();
-      const response = await axios.get('http://localhost:5000/api/messages/jobseeker/employers', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.get('/messages/jobseeker/employers');
 
       if (response.data?.success) setEmployers(response.data.data || []);
     } catch (error) {
@@ -333,10 +336,8 @@ const JobseekerMessages = () => {
   const fetchMessages = useCallback(
     async (conversationId) => {
       try {
-        const token = getToken();
-        const response = await axios.get(`http://localhost:5000/api/messages/conversation/${conversationId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // ✅ FIXED: Use api instance instead of hardcoded localhost
+        const response = await api.get(`/messages/conversation/${conversationId}`);
 
         if (response.data?.success) {
           setMessages(response.data.data || []);
@@ -500,14 +501,8 @@ const JobseekerMessages = () => {
 
     try {
       setSending(true);
-      const token = getToken();
       const receiverId = selectedConversation.otherUser?._id;
 
-      if (!token) {
-        alert('Session expired. Please login again.');
-        navigate('/login');
-        return;
-      }
       if (!receiverId) {
         alert('Receiver not found.');
         return;
@@ -518,8 +513,9 @@ const JobseekerMessages = () => {
       formData.append('receiverId', receiverId);
       formData.append('content', newMessage || '');
 
-      const response = await axios.post('http://localhost:5000/api/messages/send', formData, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.post('/messages/send', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       if (response.data?.success) {

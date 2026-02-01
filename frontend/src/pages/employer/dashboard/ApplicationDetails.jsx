@@ -1,7 +1,7 @@
 // src/pages/employer/dashboard/ApplicationDetails.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
 import EmployerLayout from '../../../layouts/EmployerLayout';
 
 const UI = {
@@ -257,11 +257,9 @@ const ApplicationDetails = () => {
     try {
       setLoading(true);
       setError('');
-      const token = localStorage.getItem('token');
-
-      const response = await axios.get(`http://localhost:5000/api/applications/${applicationId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      
+      // ✅ CHANGED: Use api instance instead of axios with localhost
+      const response = await api.get(`/applications/${applicationId}`);
 
       if (response.data.success) {
         setApplication(response.data.application);
@@ -294,12 +292,11 @@ const ApplicationDetails = () => {
     try {
       setStatusUpdating(true);
       setError('');
-      const token = localStorage.getItem('token');
-
-      const response = await axios.put(
-        `http://localhost:5000/api/applications/${applicationId}/status`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+      
+      // ✅ CHANGED: Use api instance instead of axios with localhost
+      const response = await api.put(
+        `/applications/${applicationId}/status`,
+        { status: newStatus }
       );
 
       if (response.data.success) {

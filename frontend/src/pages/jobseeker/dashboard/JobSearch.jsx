@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import JobSeekerLayout from '../../../layouts/JobSeekerLayout';
 
+// ✅ IMPORTANT: Import your API instance
+import api from '../../../services/api'; // Adjust path if needed
+
 const JobSearch = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
@@ -163,7 +166,8 @@ const JobSearch = () => {
       if (filters.experienceLevel) params.append('experienceLevel', filters.experienceLevel);
       if (filters.salaryType) params.append('salaryType', filters.salaryType);
 
-      const response = await axios.get(`http://localhost:5000/api/jobs?${params.toString()}`);
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.get(`/jobs?${params.toString()}`);
 
       let jobsData = [];
 
@@ -324,17 +328,10 @@ const JobSearch = () => {
       setApplyError('');
       setApplySuccess('');
 
-      const token = localStorage.getItem('token');
-
-      const response = await axios.post(
-        `http://localhost:5000/api/applications/apply/${applyingJob._id}`,
-        { coverLetter },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.post(
+        `/applications/apply/${applyingJob._id}`,
+        { coverLetter }
       );
 
       if (response.data.success) {

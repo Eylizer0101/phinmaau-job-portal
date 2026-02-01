@@ -38,22 +38,23 @@ const JobSeekerDashboard = () => {
     }
   };
 
-  // ✅ SIMPLIFIED LOGIC: Exact same as JobSearch
+  // ✅ FIXED: Removed hardcoded localhost URLs
   const getCompanyLogo = (application) => {
-    // Priority 1: Logo from job (same as JobSearch)
+    // Priority 1: Logo from job
     if (application.job?.companyLogo) {
       const logo = application.job.companyLogo;
+      // Handle different URL formats properly
       if (logo.startsWith('http')) return logo;
-      if (logo.startsWith('/')) return `http://localhost:5000${logo}`;
-      return `http://localhost:5000/uploads/logos/${logo}`;
+      if (logo.startsWith('/')) return logo; // Let the browser handle relative URLs
+      return `/uploads/logos/${logo}`;
     }
     
     // Priority 2: Logo from employer profile
     if (application.employer?.employerProfile?.companyLogo) {
       const logo = application.employer.employerProfile.companyLogo;
       if (logo.startsWith('http')) return logo;
-      if (logo.startsWith('/')) return `http://localhost:5000${logo}`;
-      return `http://localhost:5000/uploads/logos/${logo}`;
+      if (logo.startsWith('/')) return logo; // Let the browser handle relative URLs
+      return `/uploads/logos/${logo}`;
     }
     
     return null; // Will trigger fallback
@@ -91,7 +92,7 @@ const JobSeekerDashboard = () => {
     try {
       setLoading(true);
       
-      // ✅ GAMITIN ANG API SERVICE
+      // ✅ GAMITIN ANG API SERVICE (already using api)
       const [appsResponse, notifResponse] = await Promise.all([
         api.get('/applications/my-applications'),
         api.get('/notifications')
@@ -243,7 +244,7 @@ const JobSeekerDashboard = () => {
   // ✅ BAGO: Function para i-mark as read ang notification
   const markNotificationAsRead = async (notificationId) => {
     try {
-      // Call backend API to mark as read
+      // ✅ FIXED: Use api instance
       const response = await api.put(`/notifications/${notificationId}/read`);
       
       if (response.data.success) {

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ Import the API instance
 import * as Yup from 'yup';
 
 /**
@@ -116,9 +116,8 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/auth/register`
-    : 'http://localhost:5000/api/auth/register';
+  // ✅ REMOVED: The problematic getApiUrl() function
+  // ✅ We'll use the api instance directly
 
   const currentYear = new Date().getFullYear();
   const yearOptions = useMemo(() => {
@@ -201,7 +200,7 @@ const RegisterPage = () => {
       return;
     }
 
-    // Submit
+    // Submit using api instance
     setLoading(true);
 
     try {
@@ -217,7 +216,8 @@ const RegisterPage = () => {
         },
       };
 
-      await axios.post(API_URL, submitData);
+      // ✅ FIXED: Use api instance instead of axios with hardcoded URL
+      await api.post('/auth/register', submitData);
 
       // Register -> Login flow (no token stored here)
       navigate('/login', {

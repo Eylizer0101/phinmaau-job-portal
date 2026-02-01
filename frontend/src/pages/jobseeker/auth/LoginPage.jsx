@@ -1,14 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const API_URL = process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/auth/login`
-    : 'http://localhost:5000/api/auth/login';
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [focused, setFocused] = useState({ email: false, password: false });
@@ -58,7 +54,7 @@ const LoginPage = () => {
       password: formData.password,
       ...(withRole ? { role: 'jobseeker' } : {}),
     };
-    return axios.post(API_URL, payload);
+    return api.post('/auth/login', payload);
   };
 
   const validateBasic = () => {

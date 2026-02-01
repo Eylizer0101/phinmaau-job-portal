@@ -15,7 +15,7 @@ import {
   faTimesCircle,
   faCircle
 } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ Import the API instance
 
 const UI = {
   pageBg: 'bg-gray-50',
@@ -56,18 +56,12 @@ const NotificationsPage = () => {
 
   const navigate = useNavigate();
 
-  // axios instance with auth token
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
+  // ✅ REMOVED: Local axios instance creation - using imported api instead
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
+      // ✅ FIXED: Use api instance instead of local axios instance
       const response = await api.get('/notifications');
 
       if (response.data.success) {
@@ -88,6 +82,7 @@ const NotificationsPage = () => {
 
   const fetchUnreadCount = async () => {
     try {
+      // ✅ FIXED: Use api instance instead of local axios instance
       const response = await api.get('/notifications/unread-count');
       if (response.data.success) setUnreadCount(response.data.count || 0);
     } catch (error) {
@@ -108,6 +103,7 @@ const NotificationsPage = () => {
 
   const handleMarkAsRead = async (notificationId) => {
     try {
+      // ✅ FIXED: Use api instance instead of local axios instance
       const response = await api.put(`/notifications/${notificationId}/read`);
 
       if (response.data.success) {
@@ -130,6 +126,7 @@ const NotificationsPage = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
+      // ✅ FIXED: Use api instance instead of local axios instance
       const response = await api.put('/notifications/mark-all-read');
       if (response.data.success) {
         setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
@@ -142,6 +139,7 @@ const NotificationsPage = () => {
 
   const handleDeleteNotification = async (notificationId) => {
     try {
+      // ✅ FIXED: Use api instance instead of local axios instance
       const response = await api.delete(`/notifications/${notificationId}`);
       if (response.data.success) {
         const deletedNotification = notifications.find((n) => n._id === notificationId);
@@ -157,6 +155,7 @@ const NotificationsPage = () => {
 
   const handleClearAll = async () => {
     try {
+      // ✅ FIXED: Use api instance instead of local axios instance
       const response = await api.delete('/notifications/clear-all');
       if (response.data.success) {
         setNotifications([]);
@@ -183,7 +182,7 @@ const NotificationsPage = () => {
   };
 
   const getNotificationTone = (type) => {
-    // matched sa “clean + minimal” style, subtle backgrounds
+    // matched sa "clean + minimal" style, subtle backgrounds
     switch (type) {
       case 'job_match':
         return 'text-blue-700 bg-blue-50 border-blue-100';

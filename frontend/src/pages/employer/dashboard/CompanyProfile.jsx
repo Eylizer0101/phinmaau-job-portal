@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import axios from 'axios';
+import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
 import EmployerLayout from '../../../layouts/EmployerLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -299,9 +299,8 @@ const CompanyProfile = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/auth/me', {
-        headers: { Authorization: `Bearer ${tokenRef.current}` },
-      });
+      // ✅ CHANGED: Use api instance instead of axios with localhost
+      const response = await api.get('/auth/me');
 
       if (response.data?.success) {
         const user = response.data.user;
@@ -580,9 +579,9 @@ const CompanyProfile = () => {
 
         if (logoFile) fd.append('companyLogo', logoFile);
 
-        const response = await axios.put('http://localhost:5000/api/auth/update-company-profile', fd, {
+        // ✅ CHANGED: Use api instance instead of axios with localhost
+        const response = await api.put('/auth/update-company-profile', fd, {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
             'Content-Type': 'multipart/form-data',
           },
         });
@@ -683,9 +682,9 @@ const CompanyProfile = () => {
         const fd = new FormData();
         fd.append('file', file);
 
-        const res = await axios.post(`http://localhost:5000/api/auth/upload-verification/${docType}`, fd, {
+        // ✅ CHANGED: Use api instance instead of axios with localhost
+        const res = await api.post(`/auth/upload-verification/${docType}`, fd, {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
             'Content-Type': 'multipart/form-data',
           },
         });

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import api from '../../../services/api'; // ✅ Import the API instance
 
 const UI = {
   // Page
@@ -223,7 +223,18 @@ const CompanyLogo = ({ logoUrl, companyName }) => {
   const [failed, setFailed] = useState(false);
   const initial = (companyName?.trim()?.[0] || 'C').toUpperCase();
 
-  if (!logoUrl || failed) {
+  // ✅ FIXED: Remove hardcoded localhost from logo URL logic
+  const getLogoUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/')) return url; // Let the browser handle relative URLs
+    // For uploaded files, they'll be relative to the backend URL
+    return url;
+  };
+
+  const finalLogoUrl = getLogoUrl(logoUrl);
+
+  if (!finalLogoUrl || failed) {
     return (
       <div className="w-14 h-14 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center flex-shrink-0">
         <span className="font-bold text-lg text-gray-700" aria-hidden="true">
@@ -237,7 +248,7 @@ const CompanyLogo = ({ logoUrl, companyName }) => {
   return (
     <div className="w-14 h-14 rounded-xl overflow-hidden border border-gray-200 bg-white flex-shrink-0">
       <img
-        src={logoUrl}
+        src={finalLogoUrl}
         alt={`${companyName || 'Company'} logo`}
         className="w-full h-full object-cover"
         onError={() => setFailed(true)}
@@ -297,16 +308,16 @@ const MyApplications = () => {
     if (application.job?.companyLogo) {
       const logo = application.job.companyLogo;
       if (logo.startsWith('http')) return logo;
-      if (logo.startsWith('/')) return `http://localhost:5000${logo}`;
-      return `http://localhost:5000/uploads/logos/${logo}`;
+      if (logo.startsWith('/')) return logo; // ✅ Let browser handle relative URLs
+      return logo; // ✅ Backend will serve the correct URL
     }
 
     // Priority 2: Logo from employer profile
     if (application.employer?.employerProfile?.companyLogo) {
       const logo = application.employer.employerProfile.companyLogo;
       if (logo.startsWith('http')) return logo;
-      if (logo.startsWith('/')) return `http://localhost:5000${logo}`;
-      return `http://localhost:5000/uploads/logos/${logo}`;
+      if (logo.startsWith('/')) return logo; // ✅ Let browser handle relative URLs
+      return logo; // ✅ Backend will serve the correct URL
     }
 
     return null;
@@ -394,9 +405,9 @@ const MyApplications = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/applications/my-applications', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // ✅ FIXED: Use api instance instead of hardcoded localhost
+      const response = await api.get('/applications/my-applications');
+      // ✅ No need for manual headers - handled by interceptor in api.js
 
       if (response.data.success) {
         setApplications(response.data.applications || []);

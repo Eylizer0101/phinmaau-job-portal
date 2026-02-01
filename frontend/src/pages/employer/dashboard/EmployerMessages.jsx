@@ -28,6 +28,7 @@ import {
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import EmployerLayout from '../../../layouts/EmployerLayout';
+import api from '../../services/api';
 
 // ---------------- UI TOKENS ----------------
 const UI = {
@@ -188,19 +189,6 @@ const makeClientId = () => `c_${Date.now()}_${Math.random().toString(16).slice(2
 // ---------------- COMPONENT ----------------
 const EmployerMessages = () => {
   const navigate = useNavigate();
-  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-  const api = useMemo(() => {
-    const instance = axios.create({
-      baseURL: API_BASE,
-    });
-    instance.interceptors.request.use((config) => {
-      const token = getToken();
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-      return config;
-    });
-    return instance;
-  }, [API_BASE]);
 
   // state
   const [conversations, setConversations] = useState([]);
@@ -265,18 +253,18 @@ const EmployerMessages = () => {
     (fileUrl) => {
       if (!fileUrl) return '';
       if (fileUrl.startsWith('http')) return fileUrl;
-      return `${API_BASE}${fileUrl}`;
+      return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${fileUrl}`;
     },
-    [API_BASE]
+    []
   );
 
   const getProfileImageUrl = useCallback(
     (imgPath) => {
       if (!imgPath) return '';
       if (imgPath.startsWith('http')) return imgPath;
-      return `${API_BASE}${imgPath}`;
+      return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${imgPath}`;
     },
-    [API_BASE]
+    []
   );
 
   const openFile = useCallback(
@@ -317,7 +305,7 @@ const EmployerMessages = () => {
   // ---------------- API ----------------
   const fetchConversations = useCallback(async () => {
     try {
-      const res = await api.get('/api/messages/conversations');
+      const res = await api.get('/messages/conversations');
       if (res.data?.success) setConversations(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -327,7 +315,7 @@ const EmployerMessages = () => {
 
   const fetchJobseekers = useCallback(async () => {
     try {
-      const res = await api.get('/api/messages/employer/jobseekers');
+      const res = await api.get('/messages/employer/jobseekers');
       if (res.data?.success) setJobseekers(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -348,7 +336,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
     
     // STRATEGY 1: Try the dedicated endpoint first
     try {
-      const statusRes = await api.get(`/api/applications/jobseeker/${jobseekerId}/status`);
+      const statusRes = await api.get(`/applications/jobseeker/${jobseekerId}/status`);
       console.log('Status API response:', statusRes.data);
       
       if (statusRes.data?.success) {
@@ -382,7 +370,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
     
     // STRATEGY 3: Check employer's applications
     try {
-      const applicationsRes = await api.get('/api/applications/employer/all');
+      const applicationsRes = await api.get('/applications/employer/all');
       if (applicationsRes.data?.success) {
         const applications = applicationsRes.data.applications || [];
         
@@ -418,7 +406,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
   const fetchMessages = useCallback(
     async (conversationId) => {
       try {
-        const res = await api.get(`/api/messages/conversation/${conversationId}`);
+        const res = await api.get(`/messages/conversation/${conversationId}`);
         if (res.data?.success) {
           setMessages(res.data.data || []);
           setTimeout(() => scrollToBottom(false), 0);
@@ -436,7 +424,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
     async (conversationId) => {
       if (!conversationId) return;
       try {
-        await api.post(`/api/messages/mark-read`, { conversationId });
+        await api.post(`/messages/mark-read`, { conversationId });
         fetchConversations();
       } catch (err) {
         // Silent fail - this endpoint might not exist
@@ -449,7 +437,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
   const getOrCreateConversation = useCallback(
     async (receiverId) => {
       try {
-        const res = await api.post('/api/messages/conversations/get-or-create', { receiverId });
+        const res = await api.post('/messages/conversations/get-or-create', { receiverId });
         if (res.data?.success) return res.data.data;
       } catch {
         // fallback below
@@ -712,7 +700,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
       formData.append('receiverId', receiverId);
       formData.append('content', optimisticMsg.content);
 
-      const res = await api.post('/api/messages/send', formData, {
+      const res = await api.post('/messages/send', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -774,7 +762,7 @@ const fetchApplicationStatus = useCallback(async (jobseekerId) => {
     }
 
     try {
-      const res = await api.post('/api/messages/schedule-interview', { receiverId, interviewDetails });
+      const res = await api.post('/messages/schedule-interview', { receiverId, interviewDetails });
       if (res.data?.success) {
         setMessages((prev) => [...prev, res.data.data]);
         setShowInterviewModal(false);

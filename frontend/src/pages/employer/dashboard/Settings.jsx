@@ -1,6 +1,5 @@
 // src/pages/employer/dashboard/Settings.jsx
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faLock,
@@ -16,6 +15,7 @@ import {
   faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
 import EmployerLayout from '../../../layouts/EmployerLayout';
+import api from '../../services/api';
 
 /** ---------- Small UI helpers ---------- */
 const cx = (...classes) => classes.filter(Boolean).join(' ');
@@ -237,9 +237,7 @@ const Settings = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/auth/me');
 
       if (response.data.success) {
         const user = response.data.user;
@@ -314,16 +312,13 @@ const Settings = () => {
     setSuccess((prev) => ({ ...prev, account: '' }));
 
     try {
-      const token = localStorage.getItem('token');
       const payload = {
         firstName: (userData.firstName || '').trim(),
         lastName: (userData.lastName || '').trim(),
         fullName
       };
 
-      const response = await axios.put('http://localhost:5000/api/auth/update-profile', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.put('/auth/update-profile', payload);
 
       if (response.data.success) {
         setSuccess((prev) => ({ ...prev, account: 'Account information updated.' }));
@@ -367,12 +362,10 @@ const Settings = () => {
     setSuccess((prev) => ({ ...prev, password: '' }));
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(
-        'http://localhost:5000/api/auth/change-password',
-        { currentPassword: accountData.currentPassword, newPassword: accountData.newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.put('/auth/change-password', {
+        currentPassword: accountData.currentPassword,
+        newPassword: accountData.newPassword
+      });
 
       if (response.data.success) {
         setSuccess((prev) => ({ ...prev, password: 'Password changed successfully.' }));
@@ -397,12 +390,7 @@ const Settings = () => {
     setSuccess((prev) => ({ ...prev, notifications: '' }));
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(
-        'http://localhost:5000/api/auth/update-notifications',
-        notificationData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.put('/auth/update-notifications', notificationData);
 
       if (response.data.success) {
         setSuccess((prev) => ({ ...prev, notifications: 'Notification preferences updated.' }));
