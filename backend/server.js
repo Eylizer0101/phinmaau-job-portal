@@ -34,7 +34,11 @@ createUploadsDirectories();
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: [
+        'http://localhost:3000',
+        'https://phinmaau-job-portal-frontend.onrender.com',
+        'https://phinmaau-job-portal.onrender.com'
+    ],
     credentials: true
 }));
 app.use(express.json());
