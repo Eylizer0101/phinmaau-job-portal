@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../../services/api'; // ✅ Import the API instance
+import api from "../../services/api";// ✅ Import the API instance
 import * as Yup from 'yup';
 
 /**

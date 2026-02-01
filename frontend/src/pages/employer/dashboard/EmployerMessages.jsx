@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSearch,
@@ -28,7 +27,7 @@ import {
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import EmployerLayout from '../../../layouts/EmployerLayout';
-import api from '../../services/api';
+import api from "../../services/api"; // ✅ FIXED: Correct import path
 
 // ---------------- UI TOKENS ----------------
 const UI = {
@@ -186,6 +185,21 @@ const getFileIcon = (type) => {
 // Generates stable client-side ids (for optimistic UI)
 const makeClientId = () => `c_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
+// ✅ FIXED: Helper functions without hardcoded localhost
+const getFileUrl = (fileUrl) => {
+  if (!fileUrl) return '';
+  if (fileUrl.startsWith('http')) return fileUrl;
+  // Backend will serve the correct URL
+  return fileUrl;
+};
+
+const getProfileImageUrl = (imgPath) => {
+  if (!imgPath) return '';
+  if (imgPath.startsWith('http')) return imgPath;
+  // Backend will serve the correct URL
+  return imgPath;
+};
+
 // ---------------- COMPONENT ----------------
 const EmployerMessages = () => {
   const navigate = useNavigate();
@@ -248,24 +262,6 @@ const EmployerMessages = () => {
       if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     };
   }, []);
-
-  const getFileUrl = useCallback(
-    (fileUrl) => {
-      if (!fileUrl) return '';
-      if (fileUrl.startsWith('http')) return fileUrl;
-      return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${fileUrl}`;
-    },
-    []
-  );
-
-  const getProfileImageUrl = useCallback(
-    (imgPath) => {
-      if (!imgPath) return '';
-      if (imgPath.startsWith('http')) return imgPath;
-      return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${imgPath}`;
-    },
-    []
-  );
 
   const openFile = useCallback(
     (fileData) => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JobSeekerLayout from '../../../layouts/JobSeekerLayout';
 import debounce from 'lodash/debounce';
-import api from '../../../services/api'; // ✅ Import the API instance
+import api from "../../services/api"; // ✅ Import the API instance
 
 // ✅ FontAwesome icons via react-icons
 import {

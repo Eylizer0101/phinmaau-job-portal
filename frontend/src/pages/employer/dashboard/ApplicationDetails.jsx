@@ -1,7 +1,7 @@
 // src/pages/employer/dashboard/ApplicationDetails.jsx
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
+import api from "../../services/api"; // ✅ CHANGED: Import api instead of axios
 import EmployerLayout from '../../../layouts/EmployerLayout';
 
 const UI = {

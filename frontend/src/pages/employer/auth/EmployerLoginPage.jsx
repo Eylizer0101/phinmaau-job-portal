@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from "../../services/api"; // ✅ CHANGED: Import api instead of axios
 
 const EmployerLoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const API_URL = process.env.REACT_APP_API_URL
-    ? process.env.REACT_APP_API_URL
-    : 'http://localhost:5000/api';
+  // ✅ REMOVED: API_URL variable since we'll use api.js
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -55,13 +53,14 @@ const EmployerLoginPage = () => {
     localStorage.removeItem('user');
   };
 
+  // ✅ CHANGED: Use api instance instead of axios with localhost
   const runLogin = async ({ withRole }) => {
     const payload = {
       email: normalizeEmail(formData.email),
       password: formData.password,
       ...(withRole ? { role: 'employer' } : {}),
     };
-    return axios.post(`${API_URL}/auth/login`, payload);
+    return api.post('/auth/login', payload);
   };
 
   // ✅ NEW: client-side required validation (show messages under fields)

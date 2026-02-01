@@ -1,7 +1,7 @@
 // src/pages/jobseeker/dashboard/JobSeekerDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../../services/api';
+import api from "../../services/api";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBriefcase, faClock, faCheckCircle, faTimesCircle,

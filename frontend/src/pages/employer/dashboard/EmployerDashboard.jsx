@@ -1,7 +1,7 @@
 // src/pages/employer/dashboard/EmployerDashboard.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../../services/api'; // ✅ CHANGED: Import api instead of axios
+import api from "../../services/api"; // ✅ CHANGED: Import api instead of axios
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faExclamationCircle,

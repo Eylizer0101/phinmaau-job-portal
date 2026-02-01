@@ -15,7 +15,7 @@ import {
   faTimesCircle,
   faCircle
 } from '@fortawesome/free-solid-svg-icons';
-import api from '../../../services/api'; // ✅ Import the API instance
+import api from "../../services/api"; // ✅ Import the API instance
 
 const UI = {
   pageBg: 'bg-gray-50',

@@ -1,7 +1,7 @@
 // src/pages/employer/auth/EmployerRegisterPage.jsx
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from "../../services/api"; // ✅ CHANGED: Import api instead of axios
 
 const INDUSTRIES = [
   'Accounting',
@@ -35,9 +35,7 @@ const INDUSTRIES = [
 const EmployerRegisterPage = () => {
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL
-  ? process.env.REACT_APP_API_URL
-  : 'http://localhost:5000/api';
+  // ✅ REMOVED: API_URL variable since we'll use api.js
 
   const [formData, setFormData] = useState({
     contactPerson: '',
@@ -143,7 +141,8 @@ const EmployerRegisterPage = () => {
         },
       };
 
-      const response = await axios.post(`${API_URL}/auth/register`, payload);
+      // ✅ CHANGED: Use api instance instead of axios with localhost
+      const response = await api.post('/auth/register', payload);
 
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
